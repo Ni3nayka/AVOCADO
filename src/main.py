@@ -2,7 +2,7 @@ from graphics.graphics import graphics,messagebox
 from device.joystick import my_universal_joystick
 
 from threading import Thread
-from time import sleep
+#from time import sleep
 
 global_potok_flag = True
 
@@ -20,11 +20,18 @@ class potok(Thread):
 
         while global_potok_flag:
             gamepad.update()
-            a = ' '.join(map(str,gamepad.joystick+gamepad.button+gamepad.arrow+['!']))
-            if a!=self.mem:
-                self.mem = a
+            j = []
+            for i in gamepad.joystick:
+                j.append(int(i*100))
+            a = []
+            for i in gamepad.arrow:
+                for ii in i:
+                    a.append(ii)
+            t = "{ joystick: " + ' '.join(map(str,j)) + " button: " +''.join(map(str,gamepad.button)) + " arrow: " +' '.join(map(str,a)) + " }"
+            if t!=self.mem:
+                self.mem = t
                 print(self.mem)
-            sleep(0.05)
+            #sleep(0.05)
         
 
 def test(command,data=""):
