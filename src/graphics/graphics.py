@@ -16,6 +16,7 @@ from tkinter import messagebox
 from time import sleep
 from os import path
 import webbrowser
+import socket
 
 class EntryWithPlaceholder(Entry):
     def __init__(self, master=None, placeholder=None):
@@ -70,6 +71,10 @@ class graphics:
         print(command,data)
 
     def create_main_menu(self):
+
+        lbl_ip = Label(text="ваш IP: " + str(socket.gethostbyname(socket.gethostname())))
+        lbl_ip.place(relx=.5, rely=.7, anchor="c")
+        self.array_viget.append(lbl_ip)
         
         lbl_1 = Label(text="Подключите геймпад")
         lbl_1.place(relx=.5, rely=.15, anchor="c")
@@ -103,11 +108,11 @@ class graphics:
         # self.port_speed_viget = EntryWithPlaceholder(master=self.window,placeholder="9600")
         # self.port_speed_viget.place(relx=.5, rely=.55, anchor="c",height = 19,width = 150)
 
-        lbl_4 = Label(text="Запишите порт (ip:port)")
+        lbl_4 = Label(text="Запишите порт (port)")
         lbl_4.place(relx=.5, rely=.35, anchor="c")
         self.array_viget.append(lbl_4)
 
-        self.port_number_viget = EntryWithPlaceholder(master=self.window,placeholder="192.168.1.20:12345")
+        self.port_number_viget = EntryWithPlaceholder(master=self.window,placeholder="1234")
         self.port_number_viget.place(relx=.5, rely=.5, anchor="c",height = 19,width = 150)
         self.array_viget.append(self.port_number_viget)
 
@@ -130,10 +135,17 @@ class graphics:
     
     def press_start(self):
         try:
-            #print(self.input_mode_var.get(),self.contact_mode_var.get(),self.port_number_viget.get())
-            self.extern_fun("start",self.port_number_viget.get())
-            self.clear_viget()
-            self.create_gamepad_menu()
+            try:
+                #print(self.input_mode_var.get(),self.contact_mode_var.get(),self.port_number_viget.get())
+                port = int(self.port_number_viget.get())
+                if port<0 or port>99999:
+                    messagebox.showerror("SaveSystem", "ERROR 3: порт не может иметь такой номер")
+                    return
+                self.extern_fun("start",port)
+                self.clear_viget()
+                self.create_gamepad_menu()
+            except ValueError:
+                messagebox.showerror("SaveSystem", "ERROR 2: порт не может быть не целочисленным")
         except AttributeError:
             messagebox.showerror("SaveSystem", "ERROR 1: ошибка вызова виджета с необходимыми данными")
 
