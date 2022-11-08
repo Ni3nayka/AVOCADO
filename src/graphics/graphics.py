@@ -67,18 +67,58 @@ class graphics:
 
         self.create_main_menu()
 
+        # UP MENU
+        self.MENU = Menu(self.window) 
+
+        self.new_item_m = Menu(self.MENU)  
+        self.new_item_m.add_command(label='скачать Arduino IDE',command=lambda:webbrowser.open('https://www.arduino.cc/en/software', new=2))  
+        self.new_item_m.add_command(label='установить esp в Arduino IDE',command=lambda:webbrowser.open('https://radioprog.ru/post/863', new=2)) 
+        self.new_item_m.add_command(label='мануал для прошивки по wifi',command=self.develop_message) 
+        self.new_item_m.add_command(label='мануал по использованию программы',command=self.develop_message) 
+        self.MENU.add_cascade(label='мануал', menu=self.new_item_m)
+
+
+        self.new_item_i = Menu(self.MENU)  
+        self.new_item_i.add_command(label='новую версию программы',command=lambda:webbrowser.open('https://github.com/Ni3nayka/AVOCADO/releases', new=2))
+        self.new_item_i.add_command(label='библиотеку для esp',command=lambda:webbrowser.open('https://github.com/Ni3nayka/AVOCADO_esp/releases', new=2))
+        self.MENU.add_cascade(label='скачать', menu=self.new_item_i)
+
+        self.new_item_11 = Menu(self.MENU)  
+        self.new_item_11.add_command(label='оценить',command=self.develop_message) 
+        self.new_item_11.add_command(label='о программе',command=self.about_program) 
+        self.MENU.add_cascade(label='о программе', menu=self.new_item_11)
+
+        # self.radio_up_menu = StringVar()
+        # self.radio_up_menu.set("monitor")
+        # #self.radio_up_menu.trace("w", self.up_menu_look)
+        # self.new_item_l = Menu(self.MENU)
+        # self.new_item_l.add_radiobutton(label="консоль",value="monitor",variable=self.radio_up_menu)
+        # self.new_item_l.add_radiobutton(label="геймпад",value="gamepad",variable=self.radio_up_menu)
+        # self.new_item_l.add_radiobutton(label="геймпад и консоль",value="monitor and gamepad",variable=self.radio_up_menu)
+        # self.MENU.add_cascade(label='режим работы', menu=self.new_item_l)
+
+        self.window.config(menu=self.MENU)
+
+    def develop_message(self):
+        messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")
+
+    def about_program(self):
+        self.develop_message()
+        ################################################################################################################################################################
+        messagebox.showinfo("о программе", "ну типа да")
+
     def extern_fun_pass(self,command,data=""):
         print(command,data)
 
     def create_main_menu(self):
 
         lbl_ip = Label(text="ваш IP: " + str(socket.gethostbyname(socket.gethostname())))
-        lbl_ip.place(relx=.5, rely=.7, anchor="c")
+        lbl_ip.place(relx=.5, rely=.5, anchor="c")
         self.array_viget.append(lbl_ip)
         
-        lbl_1 = Label(text="Подключите геймпад")
-        lbl_1.place(relx=.5, rely=.15, anchor="c")
-        self.array_viget.append(lbl_1)
+        # lbl_1 = Label(text="Подключите геймпад")
+        # lbl_1.place(relx=.5, rely=.15, anchor="c")
+        # self.array_viget.append(lbl_1)
 
         # lbl_1 = Label(text="Выберите устройство ввода")
         # lbl_1.place(relx=.5, rely=.05, anchor="c")
@@ -108,16 +148,13 @@ class graphics:
         # self.port_speed_viget = EntryWithPlaceholder(master=self.window,placeholder="9600")
         # self.port_speed_viget.place(relx=.5, rely=.55, anchor="c",height = 19,width = 150)
 
-        lbl_4 = Label(text="Запишите порт (port)")
-        lbl_4.place(relx=.5, rely=.35, anchor="c")
+        lbl_4 = Label(text="Запишите номер порта")
+        lbl_4.place(relx=.4, rely=.7, anchor="c")
         self.array_viget.append(lbl_4)
 
         self.port_number_viget = EntryWithPlaceholder(master=self.window,placeholder="1234")
-        self.port_number_viget.place(relx=.5, rely=.5, anchor="c",height = 19,width = 150)
+        self.port_number_viget.place(relx=.72, rely=.7, anchor="c",height = 19,width = 50)
         self.array_viget.append(self.port_number_viget)
-
-        # link_button = Button(text="ссылка", command=self.open_link)
-        # link_button.place(relx=.12, rely=.9, anchor="c",height = 40,width = 70)
 
         start_button = Button(text="старт",command=self.press_start) # , command=self.open_link
         start_button.place(relx=.5, rely=.9, anchor="c",height = 30,width = 70)
