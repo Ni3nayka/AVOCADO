@@ -69,8 +69,7 @@ class graphics:
 
         self.extern_fun = self.extern_fun_pass
 
-        #self.create_main_menu()
-        self.create_monitor_menu()
+        self.create_main_menu()
 
         # UP MENU
         self.MENU = Menu(self.window) 
@@ -98,7 +97,7 @@ class graphics:
         messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")
 
     def about_program(self):
-        messagebox.showinfo("о программе", "Проект AVOCADO состоит из библиотек для разных микроконтроллеров (ESP и Arduino) и программы под windows для управления этими контроллерами с помощью библиотек при использовании минимума кода.\nАвтор: Бакай Егор\nг.Москва 2022 г.")
+        messagebox.showinfo("о программе", "Проект AVOCADO состоит из библиотек для разных микроконтроллеров (ESP и Arduino) и программы под windows для управления этими контроллерами с помощью библиотек при использовании минимума кода.\nАвтор: Бакай Егор\negor_bakay@inbox.ru\nг.Москва 2022 г.")
 
     def extern_fun_pass(self,command,data=""):
         print(command,data)
@@ -117,9 +116,8 @@ class graphics:
         input_mode_viget = ttk.Combobox(self.window, textvariable = self.input_mode_var)
         input_mode_viget['values'] = self.input_mode
         input_mode_viget['state'] = 'readonly'
-        try:
-            input_mode_viget.set(self.input_mode[list(self.input_mode).index(self.input_mode_var.get())])
-        except ValueError: pass
+        try: input_mode_viget.set(self.input_mode[list(self.input_mode).index(self.input_mode_var.get())])
+        except ValueError: input_mode_viget.set(self.input_mode[0])
         input_mode_viget.place(relx=.78, rely=.15, anchor="c")
         # def callback_1(*arg):
         #     #print(input_mode_viget.current(),self.input_mode_var.get())
@@ -134,9 +132,8 @@ class graphics:
         contact_mode_viget = ttk.Combobox(self.window, textvariable = self.contact_mode_var)
         contact_mode_viget['values'] = self.contact_mode
         contact_mode_viget['state'] = 'readonly'
-        try:
-            contact_mode_viget.set(self.contact_mode[list(self.contact_mode).index(self.contact_mode_var.get())])
-        except ValueError: pass
+        try: contact_mode_viget.set(self.contact_mode[list(self.contact_mode).index(self.contact_mode_var.get())])
+        except ValueError: contact_mode_viget.set(self.contact_mode[0])
         contact_mode_viget.place(relx=.78, rely=.35, anchor="c")
         self.array_viget.append(contact_mode_viget)
 
@@ -216,7 +213,7 @@ class graphics:
     def add_line_to_text_monitor_viget(self,line):
         try: 
             self.text_monitor_viget.configure(state=NORMAL)
-            self.text_monitor_viget.insert(END, line+"\n") 
+            self.text_monitor_viget.insert(END, line) # +"\n" 
             if self.autoscroll_monitor_viget:
                 self.text_monitor_viget.see(END)
             self.text_monitor_viget.configure(state=DISABLED)
