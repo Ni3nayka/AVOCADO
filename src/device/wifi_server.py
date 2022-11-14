@@ -38,7 +38,7 @@ class wifi_server_device:
         self.wifi_device_potok = wifi_server_device_lisen(self.wifi_device)
         self.wifi_device_potok.start()
 
-    def send(self,data):
+    def write(self,data):
         self.wifi_device.send(str(data+"\n").encode('utf-8'))
 
     def get(self):
@@ -52,7 +52,7 @@ if __name__=="__main__":
     from time import sleep
     test = wifi_server_device()
     for i in range(10):
-        test.send(str(i))
+        test.write(str(i))
         sleep(0.1)
     print(test.get())
     test.close()
