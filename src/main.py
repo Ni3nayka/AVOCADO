@@ -24,7 +24,7 @@ class potok(Thread):
 
         device = 0
         if global_connect_mode=="wi-fi": device = wifi_server_device(self.port)
-        elif global_connect_mode=="bluetooth": device = wifi_server_device(self.port) ############
+        #elif global_connect_mode=="bluetooth": device = wifi_server_device(self.port) ############
         else:
             messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
             return
@@ -84,14 +84,6 @@ def test(command,data=""):
     else:
         global_data_for_device_from_monitor = ""
         global_potok_flag = False
-    # global global_potok_flag
-    # if command=="start_gamepad":
-    #     global_potok_flag = True
-    #     print(data)
-    #     a = potok(int(data))
-    #     a.start()
-    # else:
-    #     global_potok_flag = False
 
 window = graphics("AVOCADO beta version")
 window.extern_fun = test
