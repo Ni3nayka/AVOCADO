@@ -93,6 +93,16 @@ class graphics:
 
         self.window.config(menu=self.MENU)
 
+        self.expectation_viget = Label(text="Ожидание подключения....")
+
+    def create_expectation_viget(self):
+        self.expectation_viget = Label(text="Ожидание подключения....")
+        self.expectation_viget.place(relx=.5, rely=.15, anchor="c")
+
+    def del_expectation_viget(self):
+        self.expectation_viget.destroy()
+        self.expectation_viget = Label(text="Ожидание подключения....")
+
     def develop_message(self):
         messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")
 
@@ -210,6 +220,8 @@ class graphics:
         self.array_viget.append(self.text_monitor_viget)
         self.array_viget.append(scroll)
 
+        self.create_expectation_viget()
+
     def add_line_to_text_monitor_viget(self,line):
         try: 
             self.text_monitor_viget.configure(state=NORMAL)
@@ -223,6 +235,8 @@ class graphics:
         end_button = Button(text="стоп",command=self.press_stop) 
         end_button.place(relx=.5, rely=.5, anchor="c",height = 30,width = 70)
         self.array_viget.append(end_button)
+
+        self.create_expectation_viget()
 
     def clear_viget(self):
         for a in self.array_viget:
@@ -243,6 +257,10 @@ class graphics:
                     return
                 self.ip_port = port
             elif self.contact_mode_var.get()=="bluetooth":
+                # while dont work
+                messagebox.showerror("SaveSystem", "Извините, блютуз пока не работает, доделаю в следующей версии :)")
+                return
+                #
                 port = self.port_number_viget.get()
                 if len(port.split(":"))!=6:
                     messagebox.showerror("SaveSystem", "ERROR 6: порт не может иметь такой номер (пример: 20:A6:B6:23:0C:27)")
