@@ -49,7 +49,7 @@ class potok(Thread):
                     t = "{ joystick: " + ' '.join(map(str,j)) + " button: " +''.join(map(str,gamepad.button)) + " arrow: " +' '.join(map(str,a)) + " }"
                     if t!=self.mem:
                         self.mem = t
-                        print(self.mem)
+                        #print(self.mem)
                         device.write(t)
 
                 if global_monitor_flag:
@@ -70,6 +70,7 @@ class potok(Thread):
             print("!")
         except OSError:
             messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
+        window.del_expectation_viget()
         
 
 def test(command,data=""):

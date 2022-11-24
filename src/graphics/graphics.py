@@ -76,9 +76,10 @@ class graphics:
 
         self.new_item_m = Menu(self.MENU)  
         self.new_item_m.add_command(label='скачать Arduino IDE',command=lambda:webbrowser.open('https://www.arduino.cc/en/software', new=2))  
-        self.new_item_m.add_command(label='установить esp в Arduino IDE',command=lambda:webbrowser.open('https://radioprog.ru/post/863', new=2)) 
-        self.new_item_m.add_command(label='мануал для прошивки по wifi',command=self.develop_message) 
-        self.new_item_m.add_command(label='мануал по использованию программы',command=self.develop_message) 
+        self.new_item_m.add_command(label='установить esp в Arduino IDE (1)',command=lambda:webbrowser.open('https://radioprog.ru/post/863', new=2)) 
+        self.new_item_m.add_command(label='установить esp в Arduino IDE (2)',command=lambda:webbrowser.open('https://alexgyver.ru/lessons/esp8266/', new=2)) 
+        self.new_item_m.add_command(label='мануал для прошивки по wifi',command=lambda:webbrowser.open('https://habr.com/ru/company/first/blog/654623/', new=2)) 
+        self.new_item_m.add_command(label='мануал по использованию программы',command=lambda:webbrowser.open('https://docs.google.com/document/d/1Rvoi-yDUz9T8iqtriVZaRBL97akOxsfKGw68NE6AFoM/edit?usp=share_link', new=2)) 
         self.MENU.add_cascade(label='мануал', menu=self.new_item_m)
 
         self.new_item_i = Menu(self.MENU)  
@@ -96,12 +97,12 @@ class graphics:
         self.expectation_viget = Label(text="Ожидание подключения....")
 
     def create_expectation_viget(self):
+        self.del_expectation_viget()
         self.expectation_viget = Label(text="Ожидание подключения....")
         self.expectation_viget.place(relx=.5, rely=.15, anchor="c")
 
     def del_expectation_viget(self):
         self.expectation_viget.destroy()
-        self.expectation_viget = Label(text="Ожидание подключения....")
 
     def develop_message(self):
         messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")
