@@ -29,6 +29,8 @@ class wifi_server_device:
         self.ip = socket.gethostbyname(socket.gethostname())
         self.port = port
         self.device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def start(self):
         self.device.bind((self.ip, self.port))   
         self.device.listen(5) # Now wait for client connection.
 
@@ -45,12 +47,15 @@ class wifi_server_device:
         return self.wifi_device_potok.get()
 
     def close(self):
+        print("!")
         self.device.close()
-        self.wifi_device_potok.stop()
+        try: self.wifi_device_potok.stop()
+        except AttributeError: pass # инициализация не прошла полностью
 
 if __name__=="__main__":
     from time import sleep
     test = wifi_server_device()
+    test.start()
     for i in range(10):
         test.write(str(i))
         sleep(0.1)
