@@ -21,11 +21,12 @@ class potok(Thread):
         self.port = port
     
     def run(self):
+        device = 0
+
         try:
             global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,wifi_device_array
             gamepad = my_universal_joystick()
 
-            device = 0
             if global_connect_mode=="wi-fi": device = wifi_server_device(self.port)
             #elif global_connect_mode=="bluetooth": device = wifi_server_device(self.port) ############
             else:
@@ -75,6 +76,10 @@ class potok(Thread):
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
             else: print("хз")
+
+        try: device.close()
+        except AttributeError: pass
+
         window.del_expectation_viget()
         
 def stop_all_wifi_server():
