@@ -1,6 +1,17 @@
 import socket
 from threading import Thread
 
+def get_ip():
+    answer = 0
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        answer = s.getsockname()[0]
+        s.close()
+    except Exception:
+        return socket.gethostbyname(socket.gethostname())
+    return answer
+
 class wifi_server_device_lisen(Thread):
 
     def __init__(self,device):
@@ -26,7 +37,7 @@ class wifi_server_device_lisen(Thread):
 class wifi_server_device:
 
     def __init__(self,port=1234):
-        self.ip = socket.gethostbyname(socket.gethostname())
+        self.ip = get_ip()
         self.port = port
         self.device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -47,7 +58,7 @@ class wifi_server_device:
         return self.wifi_device_potok.get()
 
     def close(self):
-        print("!")
+        #print("!")
         self.device.close()
         try: self.wifi_device_potok.stop()
         except AttributeError: pass # инициализация не прошла полностью
@@ -61,5 +72,6 @@ if __name__=="__main__":
         sleep(0.1)
     print(test.get())
     test.close()
+    sleep(10)
 
 

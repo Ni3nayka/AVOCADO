@@ -19,6 +19,17 @@ from os import path
 import webbrowser
 import socket
 
+def get_ip():
+    answer = 0
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        answer = s.getsockname()[0]
+        s.close()
+    except Exception:
+        return socket.gethostbyname(socket.gethostname())
+    return answer
+
 class EntryWithPlaceholder(Entry):
     def __init__(self, master=None, placeholder=None):
         super().__init__(master)
@@ -118,7 +129,7 @@ class graphics:
     def create_main_menu(self):
         self.window.geometry('360x200')
 
-        lbl_ip = Label(text="ваш IP: " + str(socket.gethostbyname(socket.gethostname())))
+        lbl_ip = Label(text="ваш IP: " + str(get_ip()))
         lbl_ip.place(relx=.5, rely=.55, anchor="c")
         self.array_viget.append(lbl_ip)
 

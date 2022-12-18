@@ -11,7 +11,12 @@ global_monitor_flag = False
 global_connect_mode = "wi-fi" 
 global_data_for_device_from_monitor = ""
 
-wifi_device_array = []
+class device_pass:
+    def __init__(self): pass
+    def close(self): pass
+
+#wifi_device_array = []
+global_device = device_pass()
 
 class potok(Thread):
     
@@ -21,19 +26,23 @@ class potok(Thread):
         self.port = port
     
     def run(self):
-        device = 0
+        #device = 0
+        global_device = 0
+        # эта хрень должна быть глобальной, чтобы если не было подключения ее можно было отключить
+        # эта хрень должна быть локальной, чтобы при подключении она сама могла отключаться
 
         try:
-            global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,wifi_device_array
+            global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag#,wifi_device_array
+            #global global_device
             gamepad = my_universal_joystick()
 
-            if global_connect_mode=="wi-fi": device = wifi_server_device(self.port)
+            if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port)
             #elif global_connect_mode=="bluetooth": device = wifi_server_device(self.port) ############
             else:
                 messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
                 return
-            wifi_device_array.append(device)
-            device.start()
+            #wifi_device_array.append(device)
+            global_device.start()
 
             window.del_expectation_viget()
             
@@ -55,10 +64,10 @@ class potok(Thread):
                     if t!=self.mem:
                         self.mem = t
                         #print(self.mem)
-                        device.write(t)
+                        global_device.write(t)
 
                 if global_monitor_flag:
-                    data = device.get()
+                    data = global_device.get()
                     if data!="":
                         window.add_line_to_text_monitor_viget(data)
                     if global_data_for_device_from_monitor!="":
@@ -67,27 +76,29 @@ class potok(Thread):
                             global_data_for_device_from_monitor = global_data_for_device_from_monitor.replace('{','').replace('}','')
                             if a!=global_data_for_device_from_monitor:
                                 messagebox.showinfo("SaveSystem", "Символы '{' и '}' не отправляются данном режиме работы т.к. они нужны для работы геймпада")
-                        device.write(global_data_for_device_from_monitor)
+                        global_device.write(global_data_for_device_from_monitor)
                         global_data_for_device_from_monitor = ""
                     
                 #sleep(0.05)
-            device.close()
+            global_device.close()
         except OSError:
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
-            else: print("хз")
+            else: print("ошибка => вылет потока, сеанс не был завершен")
+        window.del_expectation_viget()
 
-        try: device.close()
+        print("2")
+        global_device.close()
+        try: global_device.close()
         except AttributeError: pass
 
-        window.del_expectation_viget()
         
-def stop_all_wifi_server():
-    for a in wifi_device_array:
-        a.close()
+# def stop_all_wifi_server():
+#     for a in wifi_device_array:
+#         a.close()
 
 def test(command,data=""):
-    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,wifi_device_array
+    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag#,wifi_device_array
 
     if command.find("start")!=-1:
 
@@ -108,11 +119,13 @@ def test(command,data=""):
     else: # stop
         global_data_for_device_from_monitor = ""
         global_potok_flag = False
-        stop_all_wifi_server()
+        #stop_all_wifi_server()
+        global_device.close()
 
 window = graphics("AVOCADO v1.1")
 window.extern_fun = test
 window.loop()
 global_potok_flag = False
 #exit()
-stop_all_wifi_server()
+#stop_all_wifi_server()
+global_device.close()
