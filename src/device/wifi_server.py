@@ -12,6 +12,17 @@ def get_ip():
         return socket.gethostbyname(socket.gethostname())
     return answer
 
+def close_all_server(ip=None):
+    if ip==None: ip = get_ip()
+    try:
+        while 1:
+            s = socket.socket()
+            s.connect((ip, 12345))     
+            # s.send(b'Hi i am aslam')
+            # print(s.recv(1024))
+            s.close()
+    except ConnectionRefusedError: pass # сокеты кончились
+
 class wifi_server_device_lisen(Thread):
 
     def __init__(self,device):
@@ -71,7 +82,9 @@ if __name__=="__main__":
         test.write(str(i))
         sleep(0.1)
     print(test.get())
+    print("end")
     test.close()
-    sleep(10)
+    #sleep(10)
+    #close_all_server()
 
 
