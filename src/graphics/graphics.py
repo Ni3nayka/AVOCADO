@@ -115,7 +115,7 @@ class graphics:
 
     def del_expectation_viget(self):
         try: self.expectation_viget.destroy()
-        except RuntimeError: print("параша потоков")
+        except RuntimeError: print("параша потоков (ошибку зафиксировала графика, при удалении одного из виджетов)")
 
     def develop_message(self):
         messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")

@@ -1,6 +1,6 @@
 from graphics.graphics import graphics,messagebox
 from device.joystick import my_universal_joystick
-from device.wifi_server import wifi_server_device
+from device.wifi_server import wifi_server_device, kill_all_server
 
 from threading import Thread
 #from time import sleep
@@ -10,6 +10,7 @@ global_gamepad_flag = False
 global_monitor_flag = False
 global_connect_mode = "wi-fi" 
 global_data_for_device_from_monitor = ""
+global_last_port = 1234
 
 class device_pass:
     def __init__(self): pass
@@ -34,6 +35,7 @@ class potok(Thread):
         try:
             global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag#,wifi_device_array
             #global global_device
+            kill_all_server(port=self.port)
             gamepad = my_universal_joystick()
 
             if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port)
@@ -81,6 +83,7 @@ class potok(Thread):
                     
                 #sleep(0.05)
             global_device.close()
+            kill_all_server(port=self.port)
         except OSError:
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
@@ -98,7 +101,7 @@ class potok(Thread):
 #         a.close()
 
 def test(command,data=""):
-    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag#,wifi_device_array
+    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_last_port#,wifi_device_array
 
     if command.find("start")!=-1:
 
@@ -110,7 +113,8 @@ def test(command,data=""):
         global_data_for_device_from_monitor = ""
         global_potok_flag = True
         print(data)
-        a = potok(int(data))
+        global_last_port = int(data)
+        a = potok(global_last_port)
         a.start()
 
     elif command=="monitor_message":
@@ -121,6 +125,7 @@ def test(command,data=""):
         global_potok_flag = False
         #stop_all_wifi_server()
         global_device.close()
+        kill_all_server(port=global_last_port)
 
 window = graphics("AVOCADO v1.1")
 window.extern_fun = test
@@ -129,3 +134,4 @@ global_potok_flag = False
 #exit()
 #stop_all_wifi_server()
 global_device.close()
+kill_all_server(port=global_last_port)

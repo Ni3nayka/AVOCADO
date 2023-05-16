@@ -12,12 +12,14 @@ def get_ip():
         return socket.gethostbyname(socket.gethostname())
     return answer
 
-def close_all_server(ip=None):
+def kill_all_server(ip=None,port=12345):
+    # создан для искуственного подключения к "серверу", чтобы он продолжил работу, а после отключения выключился,
+    # тем самым выключив поток. возможно методы close уже нецелесообразны
     if ip==None: ip = get_ip()
     try:
         while 1:
             s = socket.socket()
-            s.connect((ip, 12345))     
+            s.connect((ip, port))     
             # s.send(b'Hi i am aslam')
             # print(s.recv(1024))
             s.close()
@@ -39,6 +41,9 @@ class wifi_server_device_lisen(Thread):
         while self.flag:
             try: self.line += self.device.recv(1024).decode("utf-8")
             except socket.timeout: pass
+            except ConnectionAbortedError: 
+                print("хз что за проблема: Программа на вашем хост-компьютере разорвала установленное подключение")
+                self.stop()
 
     def get(self):
         a = self.line
