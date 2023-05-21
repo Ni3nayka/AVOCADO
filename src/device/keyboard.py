@@ -18,26 +18,24 @@ class my_keyboard:
         if self.extern_fun==None:
             self.extern_fun = self._extern_fun_pass
 
-        # def get_key_data(event):
-        #     char = event.char
-        #     if char=='': char = event.keysym
-        #     code = event.keycode
-        #     print(char,code)
-        #     print(event.char,event.keysym,event.keycode,type(event.char))
-        def key_handler(event):
-            self.extern_fun("+"+str(event.keycode))
-        def key_handler_off(event):
-            self.extern_fun("-"+str(event.keycode))
-
-        self.window.bind("<KeyPress>", key_handler)
-        self.window.bind("<KeyRelease>", key_handler_off)
+        self.window.bind("<KeyPress>", self.key_handler)
+        self.window.bind("<KeyRelease>", self.key_handler_off)
 
         if window==None:
             self.window.mainloop()
 
     def destroy(self):
-        self.window.unbind("<KeyPress>")
-        self.window.unbind("<KeyRelease>")
+        self.extern_fun = self._extern_fun_pass
+        try:
+            self.window.unbind("<KeyPress>")
+            self.window.unbind("<KeyRelease>")
+        except AttributeError: pass
+
+    def key_handler(self,event):
+        #print(event.char,event.keysym,event.keycode)
+        self.extern_fun("+"+str(event.keycode))
+    def key_handler_off(self,event):
+        self.extern_fun("-"+str(event.keycode))
         
     def _extern_fun_pass(self,data):
         print(data)
