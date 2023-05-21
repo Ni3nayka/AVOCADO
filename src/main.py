@@ -43,10 +43,10 @@ class potok(Thread):
             gamepad = my_universal_joystick()
             if len(gamepad.joystick)+len(gamepad.button)+len(gamepad.arrow)==0 and global_gamepad_flag:
                 messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
-                #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
+                #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!") # 11:11:11:11:11:11
+            
             if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port)
-            #elif global_connect_mode=="bluetooth": device = wifi_server_device(self.port) ############
+            #elif global_connect_mode=="bluetooth": device = bluetooth_device(self.port) ############
             else:
                 messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
                 return
@@ -106,7 +106,7 @@ class potok(Thread):
         except AttributeError: pass
 
 def test(command,data=""):
-    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_last_port,global_keyboard_flag#,wifi_device_array
+    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_last_port,global_keyboard_flag,global_connect_mode#,wifi_device_array
 
     if command.find("start")!=-1:
 
@@ -117,10 +117,18 @@ def test(command,data=""):
         if command.find("keyboard")!=-1: global_keyboard_flag = True
         else: global_keyboard_flag = False
 
+        if command.find("wi-fi")!=-1: global_connect_mode = "wi-fi"
+        elif command.find("bluetooth")!=-1: global_connect_mode = "bluetooth"
+        elif command.find("USB")!=-1: global_connect_mode = "USB"
+        else: 
+            messagebox.showerror("SaveSystem", "ERROR 7(1): неизвестный режим работы")
+            return
+
         global_data_for_device_from_monitor = ""
         global_potok_flag = True
         print(data)
-        global_last_port = int(data)
+        try: global_last_port = int(data)
+        except ValueError: global_last_port = data
         a = potok(global_last_port)
         a.start()
 

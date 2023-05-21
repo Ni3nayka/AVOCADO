@@ -290,17 +290,17 @@ class graphics:
                 #
                 port = self.port_number_viget.get()
                 if len(port.split(":"))!=6:
-                    messagebox.showerror("SaveSystem", "ERROR 6: порт не может иметь такой номер (пример: 20:A6:B6:23:0C:27)")
+                    messagebox.showerror("SaveSystem", "ERROR 6: порт не может иметь такой номер (пример правильного порта: 20:A6:B6:23:0C:27)")
                     return
                 self.ip_port = port
-            elif self.contact_mode_var.get()=="":
-                messagebox.showinfo("SaveSystem", "Выберите способ передачи данных")
-                return
+            # elif self.contact_mode_var.get()=="":
+            #     messagebox.showinfo("SaveSystem", "Выберите способ передачи данных")
+            #     return
             else:
                 messagebox.showerror("SaveSystem", "ERROR 5: неизвестный режим передачи данных")
                 return
             # graphic - device
-            commanda = "start"
+            commanda = "start_" + self.contact_mode_var.get()
             if self.input_mode_var.get().find("геймпад")!=-1:
                 commanda += "_gamepad"
                 self.clear_viget()
