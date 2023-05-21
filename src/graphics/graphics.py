@@ -70,7 +70,7 @@ class graphics:
         self.array_viget = []
         self.text_monitor_viget = 0
 
-        self.input_mode = ("геймпад","консоль","геймпад и консоль")
+        self.input_mode = ("геймпад","консоль","геймпад и консоль","клавиатура","клавиатура и консоль")
         self.contact_mode = ("wi-fi","bluetooth") # ,"serial"
 
         self.input_mode_var = StringVar()
@@ -104,9 +104,21 @@ class graphics:
         self.new_item_11.add_command(label='о программе',command=self.about_program) 
         self.MENU.add_cascade(label='о программе', menu=self.new_item_11)
 
+        self.up_menu__up_window = StringVar()
+        self.up_menu__up_window.set("no")
+        self.up_menu__up_window.trace("w", self.up_menu_up_window_fun)
+        self.new_item_up_window = Menu(self.MENU)
+        self.new_item_up_window.add_radiobutton(label="включить",value="yes",variable=self.up_menu__up_window)
+        self.new_item_up_window.add_radiobutton(label="выключить",value="no",variable=self.up_menu__up_window)
+        self.MENU.add_cascade(label='поверх других окон', menu=self.new_item_up_window)
         self.window.config(menu=self.MENU)
 
         self.expectation_viget = Label(text="Ожидание подключения....")
+
+    def up_menu_up_window_fun(self, *args): 
+        #self.extern_fun("up_window", "up_window_"+self.up_menu__up_window.get())
+        if self.up_menu__up_window.get()=="yes": self.window.attributes('-topmost', True)
+        else: self.window.attributes('-topmost', False)
 
     def create_expectation_viget(self):
         self.del_expectation_viget()
@@ -253,6 +265,7 @@ class graphics:
         self.create_expectation_viget()
 
     def clear_viget(self):
+        self.del_expectation_viget()
         for a in self.array_viget:
             a.destroy()
         self.array_viget.clear()
@@ -290,6 +303,10 @@ class graphics:
             commanda = "start"
             if self.input_mode_var.get().find("геймпад")!=-1:
                 commanda += "_gamepad"
+                self.clear_viget()
+                self.create_gamepad_menu()
+            if self.input_mode_var.get().find("клавиатура")!=-1:
+                commanda += "_keyboard"
                 self.clear_viget()
                 self.create_gamepad_menu()
             if self.input_mode_var.get().find("консоль")!=-1:
