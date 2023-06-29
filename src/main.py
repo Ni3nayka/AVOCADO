@@ -1,12 +1,13 @@
-from graphics.graphics import graphics,messagebox
+from graphics.graphics import graphics, messagebox
 from device.joystick import my_universal_joystick
 from device.wifi_server import wifi_server_device, kill_all_server
 from device.keyboard import my_keyboard
+from device.serial_driver import arduino_usb
 
 from threading import Thread
-#from time import sleep
+# from time import sleep
 
-global_potok_flag = True
+global_potok_flag: bool = True
 global_gamepad_flag = False
 global_monitor_flag = False
 global_keyboard_flag = False
@@ -34,9 +35,8 @@ class potok(Thread):
         global_device = 0
         # эта хрень должна быть глобальной, чтобы если не было подключения ее можно было отключить
         # эта хрень должна быть локальной, чтобы при подключении она сама могла отключаться
-
+        global global_potok_flag, global_data_for_device_from_monitor, global_gamepad_flag, global_monitor_flag, global_keyboard_flag, global_keyboard  # ,wifi_device_array
         try:
-            global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_keyboard_flag,global_keyboard#,wifi_device_array
             #global global_device
             #kill_all_server(port=self.port)
 
@@ -47,6 +47,11 @@ class potok(Thread):
             
             if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port)
             #elif global_connect_mode=="bluetooth": device = bluetooth_device(self.port) ############
+            elif global_connect_mode=="serial": 
+                global_device = arduino_usb(self.port) # ,baud=9600
+                if not global_device.enable: 
+                    messagebox.showerror("SaveSystem", "Не удалось подключиться к устройству на порте " + self.port)
+                    global_potok_flag = False
             else:
                 messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
                 return
@@ -119,7 +124,7 @@ def test(command,data=""):
 
         if command.find("wi-fi")!=-1: global_connect_mode = "wi-fi"
         elif command.find("bluetooth")!=-1: global_connect_mode = "bluetooth"
-        elif command.find("USB")!=-1: global_connect_mode = "USB"
+        elif command.find("serial")!=-1: global_connect_mode = "serial"
         else: 
             messagebox.showerror("SaveSystem", "ERROR 7(1): неизвестный режим работы")
             return
@@ -143,7 +148,7 @@ def test(command,data=""):
         global_keyboard.destroy()
         kill_all_server(port=global_last_port)
 
-window = graphics("AVOCADO v1.2")
+window = graphics("AVOCADO v1.3")
 window.extern_fun = test
 window.loop()
 global_potok_flag = False

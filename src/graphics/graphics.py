@@ -2,8 +2,9 @@
 This code write for project AVOCADO:
 https://github.com/Ni3nayka/AVOCADO
 
-Egor Bakay <egor_bakay@inbox.ru>
-nov 2022
+author: Egor Bakay <egor_bakay@inbox.ru> Ni3nayka
+write:  Nov 2022
+modify: June 2023
 '''
 
 try:
@@ -70,8 +71,8 @@ class graphics:
         self.array_viget = []
         self.text_monitor_viget = 0
 
-        self.input_mode = ("геймпад","консоль","геймпад и консоль","клавиатура","клавиатура и консоль")
-        self.contact_mode = ("wi-fi","bluetooth") # ,"serial"
+        self.input_mode = ("консоль", "геймпад", "геймпад и консоль", "клавиатура", "клавиатура и консоль")
+        self.contact_mode = ("wi-fi", "bluetooth", "serial")
 
         self.input_mode_var = StringVar()
         self.contact_mode_var = StringVar()
@@ -89,8 +90,9 @@ class graphics:
         self.new_item_m.add_command(label='мануал по использованию программы',command=lambda:webbrowser.open('https://docs.google.com/document/d/1Rvoi-yDUz9T8iqtriVZaRBL97akOxsfKGw68NE6AFoM/edit?usp=share_link', new=2)) 
         self.new_item_m.add_separator()
         self.new_item_m.add_command(label='скачать Arduino IDE',command=lambda:webbrowser.open('https://www.arduino.cc/en/software', new=2))  
-        self.new_item_m.add_command(label='установить esp в Arduino IDE (1)',command=lambda:webbrowser.open('https://radioprog.ru/post/863', new=2)) 
-        self.new_item_m.add_command(label='установить esp в Arduino IDE (2)',command=lambda:webbrowser.open('https://alexgyver.ru/lessons/esp8266/', new=2)) 
+        self.new_item_m.add_command(label='установить esp8266 в Arduino IDE (1)',command=lambda:webbrowser.open('https://radioprog.ru/post/863', new=2))
+        self.new_item_m.add_command(label='установить esp8266 в Arduino IDE (2)',command=lambda:webbrowser.open('https://alexgyver.ru/lessons/esp8266/', new=2))
+        self.new_item_m.add_command(label='установить esp32 в Arduino IDE',command=lambda:webbrowser.open('https://voltiq.ru/instruction-installing-esp32-board-in-arduino-ide-for-windows/', new=2))
         self.new_item_m.add_command(label='мануал для прошивки по wifi',command=lambda:webbrowser.open('https://habr.com/ru/company/first/blog/654623/', new=2)) 
         self.MENU.add_cascade(label='мануал', menu=self.new_item_m)
 
@@ -292,6 +294,12 @@ class graphics:
                 if len(port.split(":"))!=6:
                     messagebox.showerror("SaveSystem", "ERROR 6: порт не может иметь такой номер (пример правильного порта: 20:A6:B6:23:0C:27)")
                     return
+                self.ip_port = port
+            elif self.contact_mode_var.get()=="serial":
+                try:
+                    int(self.port_number_viget.get())
+                    port = "COM" + self.port_number_viget.get()
+                except ValueError: pass
                 self.ip_port = port
             # elif self.contact_mode_var.get()=="":
             #     messagebox.showinfo("SaveSystem", "Выберите способ передачи данных")
