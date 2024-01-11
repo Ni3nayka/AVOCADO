@@ -1,10 +1,18 @@
-from graphics.graphics import graphics, messagebox
-from device.joystick import my_universal_joystick
-from device.wifi_server import wifi_server_device, kill_all_server
-from device.keyboard import my_keyboard
-from device.serial_driver import arduino_usb
-
-from threading import Thread
+try:
+    from graphics.graphics import graphics, messagebox
+    from device.joystick import my_universal_joystick
+    from device.wifi_server import wifi_server_device, kill_all_server
+    from device.keyboard import my_keyboard
+    from device.serial_driver import arduino_usb
+    from threading import Thread
+    from sys import platform
+except ModuleNotFoundError as e:
+    print(e)
+    from time import sleep
+    print("ERROR IMPORT PYTHON LIB!!!")
+    print("if you use linux, run install.sh")
+    print("=====================================")
+    raise
 # from time import sleep
 
 global_potok_flag: bool = True
@@ -14,6 +22,8 @@ global_keyboard_flag = False
 global_connect_mode = "wi-fi" 
 global_data_for_device_from_monitor = ""
 global_last_port = 1234
+
+global_linux_mode = platform.upper().find("LINUX")>-1 # True = Linux, false = Windows
 
 class device_pass:
     def __init__(self): pass
@@ -98,7 +108,7 @@ class potok(Thread):
                 #sleep(0.05)
             global_device.close()
             global_keyboard.destroy()
-            kill_all_server(port=self.port)
+            kill_all_server(port=self.port,linux_mode=global_linux_mode)
         except OSError:
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
@@ -146,11 +156,12 @@ def test(command,data=""):
         window.del_expectation_viget()
         global_device.close()
         global_keyboard.destroy()
-        kill_all_server(port=global_last_port)
+        kill_all_server(port=global_last_port,linux_mode=global_linux_mode)
 
-window = graphics("AVOCADO v1.3")
+window = graphics("AVOCADO v1.3 beta",linux_mode=global_linux_mode)
 window.extern_fun = test
 window.loop()
 global_potok_flag = False
 global_device.close()
-kill_all_server(port=global_last_port)
+kill_all_server(port=global_last_port,linux_mode=global_linux_mode)
+#if global_linux_mode: exit()

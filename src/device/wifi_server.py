@@ -12,18 +12,21 @@ def get_ip():
         return socket.gethostbyname(socket.gethostname())
     return answer
 
-def kill_all_server(ip=None,port=12345):
+def kill_all_server(ip=None,port=12345,linux_mode=False):
     # создан для искуственного подключения к "серверу", чтобы он продолжил работу, а после отключения выключился,
     # тем самым выключив поток. возможно методы close уже нецелесообразны
     if ip==None: ip = get_ip()
     try:
         while 1:
             s = socket.socket()
+            if linux_mode:
+                s.settimeout(1)
             s.connect((ip, port))     
             # s.send(b'Hi i am aslam')
             # print(s.recv(1024))
             s.close()
     except ConnectionRefusedError: pass # сокеты кончились
+    except TimeoutError: pass # сокеты на линуксе кончились
 
 class wifi_server_device_lisen(Thread):
 

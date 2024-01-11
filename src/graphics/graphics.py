@@ -60,13 +60,15 @@ class EntryWithPlaceholder(Entry):
 
 class graphics:
     
-    def __init__(self,title='AVOCADO graphics Debug'):
+    def __init__(self,title='AVOCADO graphics Debug',linux_mode=False):
         self.name = title
         self.window = Tk()
         self.window.title(self.name)
         add_my_icon_on_window(self.window)
         #self.window.geometry('360x200')
         #self.window.resizable(0, 0)
+
+        self.linux_mode = linux_mode
 
         self.array_viget = []
         self.text_monitor_viget = 0
@@ -141,7 +143,10 @@ class graphics:
         print(command,data)
 
     def create_main_menu(self):
-        self.window.geometry('360x200')
+        if self.linux_mode: 
+            self.window.geometry('460x200')
+        else: 
+            self.window.geometry('360x200')
 
         lbl_ip = Label(text="ваш IP: " + str(get_ip()))
         lbl_ip.place(relx=.5, rely=.55, anchor="c")
