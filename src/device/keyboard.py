@@ -18,8 +18,11 @@ class my_keyboard:
         if self.extern_fun==None:
             self.extern_fun = self._extern_fun_pass
 
-        self.window.bind("<KeyPress>", self.key_handler)
-        self.window.bind("<KeyRelease>", self.key_handler_off)
+        try:
+            self.window.bind("<KeyPress>", self.key_handler)
+            self.window.bind("<KeyRelease>", self.key_handler_off)
+        except RuntimeError:
+            print("my_keyboard - крашнулся, скорее всего из-за закрытого окна tkinter")
 
         if window==None:
             self.window.mainloop()
@@ -30,6 +33,7 @@ class my_keyboard:
             self.window.unbind("<KeyPress>")
             self.window.unbind("<KeyRelease>")
         except AttributeError: pass
+        except RuntimeError: pass # для линукса, когда непредвидено закроется окно
 
     def key_handler(self,event):
         #print(event.char,event.keysym,event.keycode)
