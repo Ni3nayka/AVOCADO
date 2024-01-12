@@ -43,12 +43,13 @@ class potok(Thread):
     
     def run(self):
         #device = 0
-        global_device = 0
+        # global_device = 0
         # эта хрень должна быть глобальной, чтобы если не было подключения ее можно было отключить
         # эта хрень должна быть локальной, чтобы при подключении она сама могла отключаться
         global global_potok_flag, global_data_for_device_from_monitor, global_gamepad_flag, global_monitor_flag, global_keyboard_flag, global_keyboard  # ,wifi_device_array
         try:
-            #global global_device
+            global global_device
+            global_device = 0
             #kill_all_server(port=self.port)
 
             gamepad = my_universal_joystick()
@@ -56,7 +57,7 @@ class potok(Thread):
                 messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
                 #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!") # 11:11:11:11:11:11
             
-            if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port)
+            if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port,linux_mode=global_linux_mode)
             #elif global_connect_mode=="bluetooth": device = bluetooth_device(self.port) ############
             elif global_connect_mode=="serial": 
                 global_device = arduino_usb(self.port) # ,baud=9600
@@ -116,7 +117,7 @@ class potok(Thread):
             else: print("ошибка => вылет потока, сеанс не был завершен")
         window.del_expectation_viget()
 
-        print("конец потока обработчика UI и device")
+        print("конец потока обработчика сеанса")
         global_device.close()
         try: global_device.close()
         except AttributeError: pass

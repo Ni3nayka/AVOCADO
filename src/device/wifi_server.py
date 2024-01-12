@@ -1,5 +1,6 @@
 import socket
 from threading import Thread
+from tkinter import messagebox
 
 def get_ip():
     answer = 0
@@ -53,22 +54,55 @@ class wifi_server_device_lisen(Thread):
         self.line = ""
         return a
 
+class wifi_server_device_test_connect(Thread):
+    # https://ru.stackoverflow.com/questions/623982/Как-в-клиент-серверном-приложении-на-сокетах-узнать-что-клиент-завершил-соедине
+    # https://stackoverflow.com/questions/667640/how-to-tell-if-a-connection-is-dead-in-python
+
+    def __init__(self,device):
+        Thread.__init__(self)
+        self.device = device 
+        self.flag = True
+
+    def stop(self):
+        self.flag = False
+
+    def run(self):
+        while self.flag:
+            try: 
+                try: self.device.recv(1, socket.MSG_PEEK | socket.MSG_DONTWAIT)
+                except BlockingIOError: pass
+                if self.flag:
+                    print("клиент сказал - bye")
+                self.stop()
+                messagebox.showinfo("сообщение", "клиент отключился от сервера")
+            except socket.timeout: pass # возможно это не надо....
+            except ConnectionAbortedError: # и это тоже
+                print("хз что за проблема: Программа на вашем хост-компьютере разорвала установленное подключение")
+                self.stop()
+            except AttributeError: # это точно надо
+                self.stop()
+
 class wifi_server_device:
 
-    def __init__(self,port=1234):
+    def __init__(self,port=1234,linux_mode=False):
         self.ip = get_ip()
         self.port = port
         self.device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.linux_mode = linux_mode
 
     def start(self):
         self.device.bind((self.ip, self.port))   
         self.device.listen(5) # Now wait for client connection.
 
-        self.wifi_device, addr = self.device.accept()
-        print ('Got connection from', addr)
+        self.wifi_device, addr = self.device.accept() # тут ожидаем, пока не подключится
+        print ('клиент подключился:', addr)
 
         self.wifi_device_potok = wifi_server_device_lisen(self.wifi_device)
         self.wifi_device_potok.start()
+
+        if self.linux_mode:
+            self.wifi_device_test_connect = wifi_server_device_test_connect(self.wifi_device)
+            self.wifi_device_test_connect.start()
 
     def write(self,data):
         self.wifi_device.send(str(data+"\n").encode('utf-8'))
@@ -77,7 +111,10 @@ class wifi_server_device:
         return self.wifi_device_potok.get()
 
     def close(self):
-        #print("!")
+        print("!!!!!!!!!!111!!11!!!!!11!")
+        if self.linux_mode:
+            try: self.wifi_device_test_connect.stop()
+            except AttributeError: pass # инициализация не прошла полностью
         self.device.close()
         try: self.wifi_device_potok.stop()
         except AttributeError: pass # инициализация не прошла полностью
