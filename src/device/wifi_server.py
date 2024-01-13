@@ -13,7 +13,11 @@ def get_ip():
         return socket.gethostbyname(socket.gethostname())
     return answer
 
+global_kill_server = False
+
 def kill_all_server(ip=None,port=12345,linux_mode=False):
+    global global_kill_server
+    global_kill_server = True
     # создан для искуственного подключения к "серверу", чтобы он продолжил работу, а после отключения выключился,
     # тем самым выключив поток. возможно методы close уже нецелесообразны
     if ip==None: ip = get_ip()
@@ -27,6 +31,7 @@ def kill_all_server(ip=None,port=12345,linux_mode=False):
             # print(s.recv(1024))
             s.close()
     except ConnectionRefusedError: pass # сокеты кончились
+    except ConnectionResetError: pass # сокеты на линуксе кончились
     except TimeoutError: pass # сокеты на линуксе кончились
 
 class wifi_server_device_lisen(Thread):
@@ -67,14 +72,16 @@ class wifi_server_device_test_connect(Thread):
         self.flag = False
 
     def run(self):
+        global global_kill_server
         while self.flag:
             try: 
                 try: self.device.recv(1, socket.MSG_PEEK | socket.MSG_DONTWAIT)
                 except BlockingIOError: pass
+                if global_kill_server: self.flag = False
                 if self.flag:
                     print("клиент сказал - bye")
+                    messagebox.showinfo("сообщение", "клиент отключился от сервера")
                 self.stop()
-                messagebox.showinfo("сообщение", "клиент отключился от сервера")
             except socket.timeout: pass # возможно это не надо....
             except ConnectionAbortedError: # и это тоже
                 print("хз что за проблема: Программа на вашем хост-компьютере разорвала установленное подключение")
@@ -91,6 +98,9 @@ class wifi_server_device:
         self.linux_mode = linux_mode
 
     def start(self):
+        global global_kill_server
+        global_kill_server = False
+
         self.device.bind((self.ip, self.port))   
         self.device.listen(5) # Now wait for client connection.
 
@@ -111,10 +121,12 @@ class wifi_server_device:
         return self.wifi_device_potok.get()
 
     def close(self):
-        print("!!!!!!!!!!111!!11!!!!!11!")
         if self.linux_mode:
+            # self.wifi_device_test_connect.stop()
             try: self.wifi_device_test_connect.stop()
-            except AttributeError: pass # инициализация не прошла полностью
+            except AttributeError: 
+                pass # инициализация не прошла полностью
+                #print("wifi_device_test_connect - его нет")
         self.device.close()
         try: self.wifi_device_potok.stop()
         except AttributeError: pass # инициализация не прошла полностью
@@ -131,5 +143,10 @@ if __name__=="__main__":
     test.close()
     #sleep(10)
     #close_all_server()
+
+    # test = wifi_server_device(port=1234,linux_mode=True)
+    # test.start()
+    # test.close()
+    # kill_all_server(port=1234,linux_mode=True)
 
 
