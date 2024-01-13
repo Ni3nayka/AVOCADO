@@ -4,7 +4,7 @@ https://github.com/Ni3nayka/AVOCADO
 
 author: Egor Bakay <egor_bakay@inbox.ru> Ni3nayka
 write:  Nov 2022
-modify: June 2023
+modify: Jan 2024
 '''
 
 try:
@@ -137,7 +137,7 @@ class graphics:
         messagebox.showerror("SaveSystem", "к сожалению данная опция пока в разработке")
 
     def about_program(self):
-        messagebox.showinfo("о программе", "Проект AVOCADO состоит из библиотек для разных микроконтроллеров (ESP и Arduino) и программы под windows для управления этими контроллерами с помощью библиотек при использовании минимума кода.\nАвтор: Бакай Егор\negor_bakay@inbox.ru\nг.Москва 2023 г.")
+        messagebox.showinfo("о программе", "Проект AVOCADO состоит из библиотек для разных микроконтроллеров (ESP и Arduino) и программы под windows для управления этими контроллерами с помощью библиотек при использовании минимума кода.\nАвтор: Бакай Егор\negor_bakay@inbox.ru\nг.Москва 2024 г.")
 
     def extern_fun_pass(self,command,data=""):
         print("extern_fun_pass:",command,data)
