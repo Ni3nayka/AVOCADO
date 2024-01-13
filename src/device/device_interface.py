@@ -5,5 +5,5 @@ class device_pass:
     #def start(self, *args): pass
     def write(self, *args): pass
     def get(self, *args) -> str: return ""
-    def test(self, *args) -> (bool,str): return (True,"ok")
+    def test(self, *args) -> str: return "ok"
     def close(self, *args): pass

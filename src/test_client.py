@@ -5,7 +5,7 @@ from time import sleep
 s = socket.socket()         # Create a socket object
 #host = "192.168.1.62" #socket.gethostname() # Get local machine name
 host = get_ip()
-port = 12345                 # Reserve a port for your service.
+port = 1234                 # Reserve a port for your service.
 
 s.connect((host, port))
 # s.send(b'Hi i am aslam')     
