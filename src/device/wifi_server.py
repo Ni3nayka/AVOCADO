@@ -58,7 +58,7 @@ class wifi_server_device_lisen(Thread):
     def get(self):
         a = self.line
         self.line = ""
-        print(">>>",self.line,"<<<")
+        #print(">>>",self.line,"<<<")
         return a
 
 class wifi_server_device_test_connect(Thread):
@@ -112,9 +112,9 @@ class wifi_server_device:
         self.wifi_device_potok = wifi_server_device_lisen(self.wifi_device)
         self.wifi_device_potok.start()
 
-        # if self.linux_mode:
-        #     self.wifi_device_test_connect = wifi_server_device_test_connect(self.wifi_device)
-        #     self.wifi_device_test_connect.start()
+        if self.linux_mode:
+            self.wifi_device_test_connect = wifi_server_device_test_connect(self.wifi_device)
+            self.wifi_device_test_connect.start()
 
     def write(self,data):
         self.wifi_device.send(str(data+"\n").encode('utf-8'))
