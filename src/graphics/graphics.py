@@ -140,7 +140,7 @@ class graphics:
         messagebox.showinfo("о программе", "Проект AVOCADO состоит из библиотек для разных микроконтроллеров (ESP и Arduino) и программы под windows для управления этими контроллерами с помощью библиотек при использовании минимума кода.\nАвтор: Бакай Егор\negor_bakay@inbox.ru\nг.Москва 2023 г.")
 
     def extern_fun_pass(self,command,data=""):
-        print(command,data)
+        print("extern_fun_pass:",command,data)
 
     def create_main_menu(self):
         if self.linux_mode: 
@@ -188,7 +188,10 @@ class graphics:
         self.array_viget.append(lbl_4)
 
         self.port_number_viget = EntryWithPlaceholder(master=self.window,placeholder=str(self.ip_port))
-        self.port_number_viget.place(relx=.7, rely=.7, anchor="c",height = 19,width = 100)
+        if self.linux_mode:
+            self.port_number_viget.place(relx=.7, rely=.7, anchor="c",height = 20,width = 140)
+        else:
+            self.port_number_viget.place(relx=.7, rely=.7, anchor="c",height = 19,width = 100)
         self.array_viget.append(self.port_number_viget)
 
         start_button = Button(text="старт",command=self.press_start)
@@ -291,21 +294,25 @@ class graphics:
                     return
                 self.ip_port = port
             elif self.contact_mode_var.get()=="bluetooth":
-                # while dont work
-                messagebox.showerror("SaveSystem", "Извините, блютуз пока не работает, доделаю в следующей версии :)")
-                return
-                #
                 port = self.port_number_viget.get()
                 if len(port.split(":"))!=6:
                     messagebox.showerror("SaveSystem", "ERROR 6: порт не может иметь такой номер (пример правильного порта: 20:A6:B6:23:0C:27)")
                     return
                 self.ip_port = port
             elif self.contact_mode_var.get()=="serial":
+                port = self.port_number_viget.get()
+                error_flag = True
                 try:
-                    int(self.port_number_viget.get())
-                    port = "COM" + self.port_number_viget.get()
+                    self.ip_port = port
+                    port = port.split(":")
+                    port = [port[0],int(port[1])]
+                    error_flag = False
                 except ValueError: pass
-                self.ip_port = port
+                except IndexError: pass
+                if error_flag:
+                    messagebox.showerror("SaveSystem", "ERROR 7: порт не может иметь такой номер, формат: port:baud (пример правильного порта: COM3:9600 или /dev/ttyS0:115200)")
+                    return
+
             # elif self.contact_mode_var.get()=="":
             #     messagebox.showinfo("SaveSystem", "Выберите способ передачи данных")
             #     return

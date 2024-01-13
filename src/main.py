@@ -49,16 +49,19 @@ class potok(Thread):
         global global_potok_flag, global_data_for_device_from_monitor, global_gamepad_flag, global_monitor_flag, global_keyboard_flag, global_keyboard  # ,wifi_device_array
         try:
             global global_device
-            global_device = 0
+            global_device = device_pass()
             #kill_all_server(port=self.port)
 
             gamepad = my_universal_joystick()
             if len(gamepad.joystick)+len(gamepad.button)+len(gamepad.arrow)==0 and global_gamepad_flag:
                 messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
-                #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!") # 11:11:11:11:11:11
-            
-            if global_connect_mode=="wi-fi": global_device = wifi_server_device(self.port,linux_mode=global_linux_mode)
-            #elif global_connect_mode=="bluetooth": device = bluetooth_device(self.port) ############
+            if global_connect_mode=="wi-fi": 
+                kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
+                global_device = wifi_server_device(self.port,linux_mode=global_linux_mode)
+            elif global_connect_mode=="bluetooth": 
+                messagebox.showerror("SaveSystem", "Блютуз пока не работает, доделаю в следующей версии :)\n(но это не точно)")
+                #device = bluetooth_device(self.port) ############ 12:12:12:12:12:12
+                global_potok_flag = False
             elif global_connect_mode=="serial": 
                 global_device = arduino_usb(self.port) # ,baud=9600
                 if not global_device.enable: 
@@ -67,8 +70,9 @@ class potok(Thread):
             else:
                 messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
                 return
-            global_device.start()
-
+            
+            if global_potok_flag:
+                global_device.start() 
             window.del_expectation_viget()
 
             def keyboard_fun(data):
@@ -109,9 +113,11 @@ class potok(Thread):
 
                 #sleep(0.05)
             global_device.close()
+            #except AttributeError: pass # когда его не создали (неправильные вводные) и чтобы не ломалось
             global_keyboard.destroy()
-            kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
-        except OSError:
+            if global_connect_mode=="wi-fi": 
+                kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
+        except TypeError: #OSError:
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
             else: print("ошибка => вылет потока, сеанс не был завершен")
@@ -119,8 +125,8 @@ class potok(Thread):
 
         print("конец потока обработчика сеанса")
         global_device.close()
-        try: global_device.close()
-        except AttributeError: pass
+        # try: global_device.close()
+        # except AttributeError: pass
 
 def test(command,data=""):
     global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_last_port,global_keyboard_flag,global_connect_mode#,wifi_device_array
@@ -145,26 +151,28 @@ def test(command,data=""):
         global_potok_flag = True
         print("порт для запуска:",data)
         try: global_last_port = int(data)
-        except ValueError: global_last_port = data
+        except: global_last_port = data
         a = potok(global_last_port)
         a.start()
 
     elif command=="monitor_message":
         global_data_for_device_from_monitor += data
-        print(global_data_for_device_from_monitor)
+        print("монитор:",global_data_for_device_from_monitor)
     else: # stop
         global_data_for_device_from_monitor = ""
         global_potok_flag = False
         window.del_expectation_viget()
         global_device.close()
         global_keyboard.destroy()
-        kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
+        if global_connect_mode=="wi-fi": 
+            kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
 
 window = graphics("AVOCADO v1.3 beta",linux_mode=global_linux_mode)
 window.extern_fun = test
 window.loop()
 global_potok_flag = False
 global_device.close()
-kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
+if global_connect_mode=="wi-fi": 
+    kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
 #if global_linux_mode: exit()
 print("КОНЕЦ")

@@ -18,6 +18,7 @@ global_kill_server = False
 def kill_all_server(ip=None,port=12345,linux_mode=False):
     global global_kill_server
     global_kill_server = True
+    print("Kill all servers")
     # создан для искуственного подключения к "серверу", чтобы он продолжил работу, а после отключения выключился,
     # тем самым выключив поток. возможно методы close уже нецелесообразны
     if ip==None: ip = get_ip()
