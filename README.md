@@ -8,9 +8,7 @@ https://github.com/Ni3nayka/AVOCADO_esp/releases
 
 ### OC:
 
-windows: 7,10
+windows: 7,10 - используйте версию 1.2 (последующие не тестировались на ОС windows)
 
 Linux: debian
-
-*под линукс больше опций, чем под виндовс
 
