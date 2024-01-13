@@ -8,7 +8,6 @@ try:
     from sys import platform
 except ModuleNotFoundError as e:
     print(e)
-    from time import sleep
     print("ERROR IMPORT PYTHON LIB!!!")
     print("if you use linux, run install.sh")
     print("=====================================")

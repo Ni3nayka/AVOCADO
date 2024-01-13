@@ -9,9 +9,9 @@ port = 12345                 # Reserve a port for your service.
 
 s.connect((host, port))
 # s.send(b'Hi i am aslam')     
-for i in range(10):
+for i in range(3):
     s.send(str(str(i)+"\n").encode('utf-8'))
-    sleep(1)
+    sleep(0.2)
 print(s.recv(1024))
 print(s.recv(1024))
 s.close                     # Close the socket when done     
