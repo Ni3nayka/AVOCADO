@@ -22,15 +22,20 @@ class wifi_device(Thread,device_pass):
         Thread.__init__(self)
         if ip==None: self.ip = get_ip()
         else: self.ip = ip
-        self.port = port
+        self.port = int(port)
         self.device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.device.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # https://stackoverflow.com/questions/4465959/python-errno-98-address-already-in-use
         # self.linux_mode = linux_mode
-        self.flag = True
+        self.enable = True
         self.line = ""
         self.test_message = "ok"
         # connect
-        self.device.bind((self.ip, self.port))   
+        try: self.device.bind((self.ip, self.port))   
+        except OSError: 
+            self.test_message = "Порт занят, попробуйте другой порт"
+            print(self.test_message)
+            self.close()
+            return
         self.device.listen(5) # Now wait for client connection.
         self.wifi_device, addr = self.device.accept() # тут ожидаем, пока не подключится
         print ('клиент подключился:', addr)
@@ -38,7 +43,7 @@ class wifi_device(Thread,device_pass):
         self.start()
 
     def write(self,data): 
-        if not self.flag: return
+        if not self.enable: return
         self.wifi_device.send(str(data+"\n").encode('utf-8'))
 
     def get(self): 
@@ -50,25 +55,26 @@ class wifi_device(Thread,device_pass):
         return self.test_message
     
     def close(self):
-        if not self.flag: return
-        self.flag = False
-        self.wifi_device.close()
+        print("close", self.enable)
+        if not self.enable: return
+        self.enable = False
+        try: self.wifi_device.close()
+        except AttributeError: pass
         self.device.close()
         # kill server (кусок от старой версии, если сервера не будут выключаться, расскоментить)
-        # try:
-        #     while 1:
-        #         s = socket.socket()
-        #         if self.linux_mode:
-        #             s.settimeout(1)
-        #         s.connect((self.ip, self.port))     
-        #         s.close()
-        # except ConnectionRefusedError: pass # сокеты кончились
-        # except ConnectionResetError: pass # сокеты на линуксе кончились
-        # except TimeoutError: pass # сокеты на линуксе кончились
+        try:
+            while 1:
+                s = socket.socket()
+                s.settimeout(0.2) #if self.linux_mode:
+                s.connect((self.ip, self.port))     
+                s.close()
+        except ConnectionRefusedError: pass # сокеты кончились
+        except ConnectionResetError: pass # сокеты на линуксе кончились
+        except TimeoutError: pass # сокеты на линуксе кончились
 
     def run(self):
         self.wifi_device.settimeout(1.0) # таймаут для опроса по wifi
-        while self.flag:
+        while self.enable:
             # получаем информацию с wifi
             try: self.line += self.wifi_device.recv(1024).decode("utf-8")
             except socket.timeout: pass
@@ -78,12 +84,13 @@ class wifi_device(Thread,device_pass):
                 self.test_message = "Программа на вашем хост-компьютере разорвала установленное подключение"
             except OSError: pass # скорее всего уже отключили...
             # проверяем, девайс еще живой или нет
-            if self.flag: # https://stackoverflow.com/questions/667640/how-to-tell-if-a-connection-is-dead-in-python
+            if self.enable: # https://stackoverflow.com/questions/667640/how-to-tell-if-a-connection-is-dead-in-python
                 try:
                     buf = self.wifi_device.recv(1, socket.MSG_PEEK | socket.MSG_DONTWAIT)
                     if buf == b'':
+                        if self.enable:
+                            self.test_message = "Клиент прервал соединение"
                         self.close()
-                        self.test_message = "Клиент прервал соединение"
                 except BlockingIOError as exc:
                     if exc.errno != errno.EAGAIN:
                         # Raise on unknown exception

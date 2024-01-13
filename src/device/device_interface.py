@@ -6,4 +6,4 @@ class device_pass:
     def write(self, *args): pass
     def get(self, *args) -> str: return ""
     def test(self, *args) -> str: return "ok"
-    def close(self, *args): pass
+    def close(self, *args): print("WARNING: CLOSE WITH BASIC INTERFACE!")

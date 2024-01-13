@@ -14,4 +14,4 @@ for i in range(3):
     sleep(0.2)
 print(s.recv(1024))
 print(s.recv(1024))
-s.close                     # Close the socket when done     
+s.close()                     # Close the socket when done     
