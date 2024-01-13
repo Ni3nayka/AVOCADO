@@ -2,5 +2,6 @@
 /src/graphics/__pycache__
 /src/device/__pycache__
 /src/.idea
+/src/test.py
 /version_bank
 avocado_linux_run.desktop

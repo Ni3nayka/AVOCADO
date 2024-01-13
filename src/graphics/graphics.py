@@ -2,6 +2,9 @@
 This code write for project AVOCADO:
 https://github.com/Ni3nayka/AVOCADO
 
+links:
+https://stackoverflow.com/questions/70364784/messagebox-in-tkinter-is-unresponsive-when-i-click-the-combobox
+
 author: Egor Bakay <egor_bakay@inbox.ru> Ni3nayka
 write:  Nov 2022
 modify: Jan 2024
@@ -69,6 +72,7 @@ class graphics:
         #self.window.resizable(0, 0)
 
         self.linux_mode = linux_mode
+        self.monitor_line = ""
 
         self.array_viget = []
         self.text_monitor_viget = 0
@@ -248,6 +252,7 @@ class graphics:
         self.array_viget.append(entry)
 
         # большое поле для вывода полученной инфы
+        self.monitor_line = ""
         self.text_monitor_viget = Text(state='disabled')
         scroll = Scrollbar(command=self.text_monitor_viget.yview)
         scroll.pack(side=RIGHT, fill=Y)
@@ -260,8 +265,14 @@ class graphics:
 
     def add_line_to_text_monitor_viget(self,line):
         try: 
-            self.text_monitor_viget.configure(state=NORMAL)
-            self.text_monitor_viget.insert(END, line) # +"\n" 
+            self.text_monitor_viget.configure(state=NORMAL) 
+            #print(">>>",line,"<<<")
+            # self.monitor_line += line
+            # if len(self.monitor_line.split("\n"))>20:
+            #     print(self.monitor_line)
+            #     self.monitor_line = ''.join(self.monitor_line.split("\n")[10::])
+            #     print(self.monitor_line)
+            self.text_monitor_viget.insert(END, line) # +"\n"
             if self.autoscroll_monitor_viget:
                 self.text_monitor_viget.see(END)
             self.text_monitor_viget.configure(state=DISABLED)
