@@ -1,5 +1,5 @@
 import socket               # Import socket module
-from device.wifi_server import get_ip
+from device.wifi_driver import get_ip
 from time import sleep
 
 s = socket.socket()         # Create a socket object

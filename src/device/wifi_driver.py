@@ -50,6 +50,7 @@ class wifi_device(Thread,device_pass):
         return self.test_message
     
     def close(self):
+        if not self.flag: return
         self.flag = False
         self.wifi_device.close()
         self.device.close()
