@@ -1,8 +1,8 @@
 try:
     from graphics.graphics import graphics, messagebox
-    from device.joystick import my_universal_joystick
+    from user.joystick import my_universal_joystick
     from device.wifi_server import wifi_server_device, kill_all_server, get_ip
-    from device.keyboard import my_keyboard
+    from user.keyboard import my_keyboard
     from device.serial_driver import arduino_usb
     from threading import Thread
     from sys import platform
