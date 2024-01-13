@@ -63,9 +63,9 @@ class potok(Thread):
                 #device = bluetooth_device(self.port) ############ 12:12:12:12:12:12
                 global_potok_flag = False
             elif global_connect_mode=="serial": 
-                global_device = arduino_usb(self.port) # ,baud=9600
+                global_device = arduino_usb(self.port[0],self.port[1]) # ,baud=9600
                 if not global_device.enable: 
-                    messagebox.showerror("SaveSystem", "Не удалось подключиться к устройству на порте " + self.port)
+                    messagebox.showerror("SaveSystem", "Не удалось подключиться к устройству на порте " + str(self.port))
                     global_potok_flag = False
             else:
                 messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
@@ -117,7 +117,7 @@ class potok(Thread):
             global_keyboard.destroy()
             if global_connect_mode=="wi-fi": 
                 kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
-        except TypeError: #OSError:
+        except OSError: #TypeError:
             if global_potok_flag:
                 messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
             else: print("ошибка => вылет потока, сеанс не был завершен")
