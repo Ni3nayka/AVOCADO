@@ -7,7 +7,10 @@ AVOCADO - реализация wifi,bluetooth,Serail монитора для к�
 https://github.com/Ni3nayka/AVOCADO_esp/releases
 
 OC:
+
 windows: 7,10
+
 Linux: debian
+
 *под линукс больше опций, чем под виндовс
 
