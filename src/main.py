@@ -7,7 +7,7 @@ try:
     from graphics.graphics import graphics, messagebox
     from threading import Thread
     from sys import platform
-    # from time import sleep
+    from time import sleep
 except ModuleNotFoundError as e:
     print(e)
     print("ERROR IMPORT PYTHON LIB!!!")
@@ -31,7 +31,7 @@ class global_data:
         self.data_for_device_from_monitor:str = ""
         self.port = 1234 # last_port
         # object
-        self.device = [device_pass()]
+        self.device = device_pass()
         self.keyboard = keyboard_pass()
 DATA = global_data()
 
@@ -50,7 +50,7 @@ class potok(Thread):
         if len(gamepad.joystick)+len(gamepad.button)+len(gamepad.arrow)==0 and self.DATA.gamepad_flag:
             messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
         if self.DATA.connect_mode=="wi-fi": 
-            self.DATA.device.append(wifi_device(ip=self.DATA.ip,port=self.DATA.port)) # ,linux_mode=self.DATA.linux_mode
+            self.DATA.device = wifi_device(ip=self.DATA.ip,port=self.DATA.port) # ,linux_mode=self.DATA.linux_mode
         elif self.DATA.connect_mode=="bluetooth": 
             messagebox.showerror("SaveSystem", "Блютуз пока не работает, доделаю в следующей версии :)\n(но это не точно)")
             #device = bluetooth_device(self.DATA.port) ############ 12:12:12:12:12:12
@@ -63,14 +63,15 @@ class potok(Thread):
         else:
             messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
             return
+        # setup
+        while self.DATA.potok_flag and self.DATA.device.test()==self.DATA.device.DEVICE_SETUP: sleep(0.2)
         # удаляем иконку ожидания (все готово или не было контакта от кого-то)
         window.del_expectation_viget()
         # keyboard
         def keyboard_fun(data):
-            self.DATA.device[-1].write(data)
-        self.DATA.keyboard = my_keyboard(keyboard_fun,window.window)
-        if not self.DATA.keyboard_flag:
-            self.DATA.keyboard.destroy()
+            self.DATA.device.write(data)
+        if self.DATA.keyboard_flag:
+            self.DATA.keyboard = my_keyboard(keyboard_fun,window.window)
         # loop
         while self.DATA.potok_flag:
             # геймпад
@@ -87,10 +88,10 @@ class potok(Thread):
                 if t!=self.joystick_save:
                     self.joystick_save = t
                     #print(self.mem)
-                    self.DATA.device[-1].write(t)
+                    self.DATA.device.write(t)
             # монитор
             if self.DATA.monitor_flag:
-                data = self.DATA.device[-1].get()
+                data = self.DATA.device.get()
                 if data!="":
                     window.add_line_to_text_monitor_viget(data)
                 if self.DATA.data_for_device_from_monitor!="":
@@ -99,11 +100,12 @@ class potok(Thread):
                         self.DATA.data_for_device_from_monitor = self.DATA.data_for_device_from_monitor.replace('{','').replace('}','')
                         if a!=self.DATA.data_for_device_from_monitor:
                             messagebox.showinfo("SaveSystem", "Символы '{' и '}' не отправляются данном режиме работы т.к. они нужны для работы геймпада")
-                    self.DATA.device[-1].write(self.DATA.data_for_device_from_monitor)
+                    self.DATA.device.write(self.DATA.data_for_device_from_monitor)
                     self.DATA.data_for_device_from_monitor = ""
-            #sleep(0.05)
+            # чтобы старые ведра не умирали при запуске этого ПО
+            sleep(0.05) 
         # закрываем поток
-        self.DATA.device[-1].close()
+        self.DATA.device.close()
         self.DATA.keyboard.destroy()
         print("конец потока обработчика сеанса")
 
@@ -127,8 +129,6 @@ def test(command,data=""):
         DATA.data_for_device_from_monitor = ""
         DATA.potok_flag = True
         print("порт для запуска:",data)
-        # try: DATA.port = int(data)
-        # except: 
         DATA.port = data
         potok(DATA)
     elif command=="monitor_message":
@@ -137,15 +137,13 @@ def test(command,data=""):
     else: # stop
         DATA.data_for_device_from_monitor = ""
         DATA.potok_flag = False
-        DATA.device[-1].close()
+        DATA.device.close()
         DATA.keyboard.destroy()
         window.del_expectation_viget()
-        # if DATA.connect_mode=="wi-fi": 
-        #     kill_all_server(ip=DATA.ip,port=DATA.last_port,linux_mode=DATA.linux_mode)
 
 window = graphics("AVOCADO v2.0 beta",linux_mode=DATA.linux_mode)
 window.extern_fun = test
 window.loop()
 DATA.potok_flag = False
-DATA.device[-1].close()
+DATA.device.close()
 print("КОНЕЦ")

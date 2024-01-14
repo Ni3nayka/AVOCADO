@@ -20,6 +20,7 @@ class wifi_device(Thread,device_pass):
     def __init__(self,ip=None,port=1234): # ,linux_mode=False
         # setup
         Thread.__init__(self)
+        device_pass.__init__(self,True)
         if ip==None: self.ip = get_ip()
         else: self.ip = ip
         self.port = int(port)
@@ -28,17 +29,7 @@ class wifi_device(Thread,device_pass):
         # self.linux_mode = linux_mode
         self.enable = True
         self.line = ""
-        self.test_message = "ok"
-        # connect
-        try: self.device.bind((self.ip, self.port))   
-        except OSError: 
-            self.test_message = "Порт занят, попробуйте другой порт"
-            print(self.test_message)
-            self.close()
-            return
-        self.device.listen(5) # Now wait for client connection.
-        self.wifi_device, addr = self.device.accept() # тут ожидаем, пока не подключится
-        print ('клиент подключился:', addr)
+        self.test_message = self.DEVICE_SETUP
         # start connect thread
         self.start()
 
@@ -73,6 +64,18 @@ class wifi_device(Thread,device_pass):
         except TimeoutError: pass # сокеты на линуксе кончились
 
     def run(self):
+        # connect
+        try: self.device.bind((self.ip, self.port))   
+        except OSError: 
+            self.test_message = "Порт занят, попробуйте другой порт"
+            print(self.test_message)
+            self.close()
+            return
+        self.device.listen(5) # Now wait for client connection.
+        self.wifi_device, addr = self.device.accept() # тут ожидаем, пока не подключится
+        print ('клиент подключился:', addr)
+        self.test_message = self.DEVICE_OK
+        # loop
         self.wifi_device.settimeout(1.0) # таймаут для опроса по wifi
         while self.enable:
             # получаем информацию с wifi
@@ -98,8 +101,8 @@ class wifi_device(Thread,device_pass):
                         pass
                 except TimeoutError: pass
                 except OSError: pass
-            print(self.test_message)
-
+            print("контакт с клиентом:",self.test_message)
+        print("поток wifi закрылся")
 
 if __name__=="__main__":
     # from time import sleep
