@@ -102,6 +102,11 @@ class potok(Thread):
                             messagebox.showinfo("SaveSystem", "Символы '{' и '}' не отправляются данном режиме работы т.к. они нужны для работы геймпада")
                     self.DATA.device.write(self.DATA.data_for_device_from_monitor)
                     self.DATA.data_for_device_from_monitor = ""
+            # фиксирование ошибки
+            device_status = self.DATA.device.test()
+            if device_status!=self.DATA.device.DEVICE_OK and device_status!=self.DATA.device.DEVICE_SETUP:
+                messagebox.showinfo("Avocado connect", device_status)
+                break
             # чтобы старые ведра не умирали при запуске этого ПО
             sleep(0.05) 
         # закрываем поток
