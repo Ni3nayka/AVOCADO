@@ -1,178 +1,154 @@
 try:
-    from graphics.graphics import graphics, messagebox
-    from device.joystick import my_universal_joystick
-    from device.wifi_server import wifi_server_device, kill_all_server, get_ip
-    from device.keyboard import my_keyboard
+    from device.device_interface import device_pass
+    from device.wifi_driver import wifi_device, get_ip
     from device.serial_driver import arduino_usb
+    from user.joystick import my_universal_joystick
+    from user.keyboard import my_keyboard
+    from graphics.graphics import graphics, messagebox
     from threading import Thread
     from sys import platform
+    from time import sleep
 except ModuleNotFoundError as e:
     print(e)
-    from time import sleep
     print("ERROR IMPORT PYTHON LIB!!!")
     print("if you use linux, run install.sh")
     print("=====================================")
     raise
-# from time import sleep
 
-global_potok_flag: bool = True
-global_gamepad_flag = False
-global_monitor_flag = False
-global_keyboard_flag = False
-global_connect_mode = "wi-fi" 
-global_data_for_device_from_monitor = ""
-global_last_port = 1234
-
-global_ip = get_ip()
-global_linux_mode = platform.upper().find("LINUX")>-1 # True = Linux, false = Windows
-
-class device_pass:
-    def __init__(self): pass
-    def close(self): pass
+class keyboard_pass(device_pass):
     def destroy(self): pass
-
-global_device = device_pass()
-global_keyboard = device_pass()
+class global_data:
+    def __init__(self):
+        # const
+        self.ip:str = get_ip()
+        self.linux_mode:bool = platform.upper().find("LINUX")>-1 # True = Linux, false = Windows
+        # flag and save
+        self.potok_flag:bool = True
+        self.gamepad_flag:bool = False
+        self.monitor_flag:bool = False
+        self.keyboard_flag:bool = False
+        self.connect_mode:str = "wi-fi" 
+        self.data_for_device_from_monitor:str = ""
+        self.port = 1234 # last_port
+        # object
+        self.device = device_pass()
+        self.keyboard = keyboard_pass()
+DATA = global_data()
 
 class potok(Thread):
     
-    def __init__(self,port): 
+    def __init__(self,data): 
         Thread.__init__(self)
-        self.mem = 0
-        self.port = port
+        self.joystick_save = 0
+        self.DATA:global_data = data
+        self.start()
     
     def run(self):
-        #device = 0
-        # global_device = 0
-        # эта хрень должна быть глобальной, чтобы если не было подключения ее можно было отключить
-        # эта хрень должна быть локальной, чтобы при подключении она сама могла отключаться
-        global global_potok_flag, global_data_for_device_from_monitor, global_gamepad_flag, global_monitor_flag, global_keyboard_flag, global_keyboard  # ,wifi_device_array
-        try:
-            global global_device
-            global_device = device_pass()
-            #kill_all_server(port=self.port)
-
-            gamepad = my_universal_joystick()
-            if len(gamepad.joystick)+len(gamepad.button)+len(gamepad.arrow)==0 and global_gamepad_flag:
-                messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
-            if global_connect_mode=="wi-fi": 
-                kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
-                global_device = wifi_server_device(self.port,linux_mode=global_linux_mode)
-            elif global_connect_mode=="bluetooth": 
-                messagebox.showerror("SaveSystem", "Блютуз пока не работает, доделаю в следующей версии :)\n(но это не точно)")
-                #device = bluetooth_device(self.port) ############ 12:12:12:12:12:12
-                global_potok_flag = False
-            elif global_connect_mode=="serial": 
-                global_device = arduino_usb(self.port[0],self.port[1]) # ,baud=9600
-                if not global_device.enable: 
-                    messagebox.showerror("SaveSystem", "Не удалось подключиться к устройству на порте " + str(self.port))
-                    global_potok_flag = False
-            else:
-                messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
-                return
-            
-            if global_potok_flag:
-                global_device.start() 
-            window.del_expectation_viget()
-
-            def keyboard_fun(data):
-                global_device.write(data)
-            global_keyboard = my_keyboard(keyboard_fun,window.window)
-            if not global_keyboard_flag:
-                global_keyboard.destroy()
-
-            while global_potok_flag:
-
-                if global_gamepad_flag:
-                    gamepad.update()
-                    j = []
-                    for i in gamepad.joystick:
-                        j.append(int(i*100))
-                    a = []
-                    for i in gamepad.arrow:
-                        for ii in i:
-                            a.append(ii)
-                    t = "{ joystick: " + ' '.join(map(str,j)) + " button: " +''.join(map(str,gamepad.button)) + " arrow: " +' '.join(map(str,a)) + " }"
-                    if t!=self.mem:
-                        self.mem = t
-                        #print(self.mem)
-                        global_device.write(t)
-
-                if global_monitor_flag:
-                    data = global_device.get()
-                    if data!="":
-                        window.add_line_to_text_monitor_viget(data)
-                    if global_data_for_device_from_monitor!="":
-                        if global_gamepad_flag:
-                            a = global_data_for_device_from_monitor
-                            global_data_for_device_from_monitor = global_data_for_device_from_monitor.replace('{','').replace('}','')
-                            if a!=global_data_for_device_from_monitor:
-                                messagebox.showinfo("SaveSystem", "Символы '{' и '}' не отправляются данном режиме работы т.к. они нужны для работы геймпада")
-                        global_device.write(global_data_for_device_from_monitor)
-                        global_data_for_device_from_monitor = ""
-
-                #sleep(0.05)
-            global_device.close()
-            #except AttributeError: pass # когда его не создали (неправильные вводные) и чтобы не ломалось
-            global_keyboard.destroy()
-            if global_connect_mode=="wi-fi": 
-                kill_all_server(ip=global_ip,port=self.port,linux_mode=global_linux_mode)
-        except OSError: #TypeError:
-            if global_potok_flag:
-                messagebox.showerror("SaveSystem", "ERROR 11: ошибка сокета, предыдущий сеанс не был корректно завершен, пожалуйста перезапустите программу. Если это не помогло, перейдите на другой порт")
-            else: print("ошибка => вылет потока, сеанс не был завершен")
+        # запускаем девайсы и ожидаем ото всех контакт
+        # self.DATA.device = device_pass()
+        gamepad = my_universal_joystick()
+        if len(gamepad.joystick)+len(gamepad.button)+len(gamepad.arrow)==0 and self.DATA.gamepad_flag:
+            messagebox.showinfo("SaveSystem", "WARNING: Геймпад или не подключен или работает некорректно")
+        if self.DATA.connect_mode=="wi-fi": 
+            self.DATA.device = wifi_device(ip=self.DATA.ip,port=self.DATA.port) # ,linux_mode=self.DATA.linux_mode
+        elif self.DATA.connect_mode=="bluetooth": 
+            messagebox.showerror("SaveSystem", "Блютуз пока не работает, доделаю в следующей версии :)\n(но это не точно)")
+            #device = bluetooth_device(self.DATA.port) ############ 12:12:12:12:12:12
+            self.DATA.potok_flag = False
+        elif self.DATA.connect_mode=="serial": 
+            self.DATA.device = arduino_usb(self.DATA.port[0],self.DATA.port[1]) # ,baud=9600
+            if not self.DATA.device.enable: 
+                messagebox.showerror("SaveSystem", "Не удалось подключиться к устройству на порте " + str(self.DATA.port))
+                self.DATA.potok_flag = False
+        else:
+            messagebox.showerror("SaveSystem", "ERROR 7: неизвестный режим работы")
+            return
+        # setup
+        while self.DATA.potok_flag and self.DATA.device.test()==self.DATA.device.DEVICE_SETUP: sleep(0.2)
+        # удаляем иконку ожидания (все готово или не было контакта от кого-то)
         window.del_expectation_viget()
-
+        # keyboard
+        def keyboard_fun(data):
+            self.DATA.device.write(data)
+        if self.DATA.keyboard_flag:
+            self.DATA.keyboard = my_keyboard(keyboard_fun,window.window)
+        # loop
+        while self.DATA.potok_flag:
+            # геймпад
+            if self.DATA.gamepad_flag:
+                gamepad.update()
+                j = []
+                for i in gamepad.joystick:
+                    j.append(int(i*100))
+                a = []
+                for i in gamepad.arrow:
+                    for ii in i:
+                        a.append(ii)
+                t = "{ joystick: " + ' '.join(map(str,j)) + " button: " +''.join(map(str,gamepad.button)) + " arrow: " +' '.join(map(str,a)) + " }"
+                if t!=self.joystick_save:
+                    self.joystick_save = t
+                    #print(self.mem)
+                    self.DATA.device.write(t)
+            # монитор
+            if self.DATA.monitor_flag:
+                data = self.DATA.device.get()
+                if data!="":
+                    window.add_line_to_text_monitor_viget(data)
+                if self.DATA.data_for_device_from_monitor!="":
+                    if self.DATA.gamepad_flag:
+                        a = self.DATA.data_for_device_from_monitor
+                        self.DATA.data_for_device_from_monitor = self.DATA.data_for_device_from_monitor.replace('{','').replace('}','')
+                        if a!=self.DATA.data_for_device_from_monitor:
+                            messagebox.showinfo("SaveSystem", "Символы '{' и '}' не отправляются данном режиме работы т.к. они нужны для работы геймпада")
+                    self.DATA.device.write(self.DATA.data_for_device_from_monitor)
+                    self.DATA.data_for_device_from_monitor = ""
+            # фиксирование ошибки
+            device_status = self.DATA.device.test()
+            if device_status!=self.DATA.device.DEVICE_OK and device_status!=self.DATA.device.DEVICE_SETUP:
+                messagebox.showinfo("Avocado connect", device_status)
+                break
+            # чтобы старые ведра не умирали при запуске этого ПО
+            sleep(0.05) 
+        # закрываем поток
+        self.DATA.device.close()
+        self.DATA.keyboard.destroy()
         print("конец потока обработчика сеанса")
-        global_device.close()
-        # try: global_device.close()
-        # except AttributeError: pass
 
 def test(command,data=""):
-    global global_potok_flag,global_data_for_device_from_monitor,global_gamepad_flag,global_monitor_flag,global_last_port,global_keyboard_flag,global_connect_mode#,wifi_device_array
-
     if command.find("start")!=-1:
-
-        if command.find("gamepad")!=-1: global_gamepad_flag = True
-        else: global_gamepad_flag = False
-        if command.find("monitor")!=-1: global_monitor_flag = True
-        else: global_monitor_flag = False
-        if command.find("keyboard")!=-1: global_keyboard_flag = True
-        else: global_keyboard_flag = False
-
-        if command.find("wi-fi")!=-1: global_connect_mode = "wi-fi"
-        elif command.find("bluetooth")!=-1: global_connect_mode = "bluetooth"
-        elif command.find("serial")!=-1: global_connect_mode = "serial"
+        # user device
+        if command.find("gamepad")!=-1: DATA.gamepad_flag = True
+        else: DATA.gamepad_flag = False
+        if command.find("monitor")!=-1: DATA.monitor_flag = True
+        else: DATA.monitor_flag = False
+        if command.find("keyboard")!=-1: DATA.keyboard_flag = True
+        else: DATA.keyboard_flag = False
+        # device
+        if command.find("wi-fi")!=-1: DATA.connect_mode = "wi-fi"
+        elif command.find("bluetooth")!=-1: DATA.connect_mode = "bluetooth"
+        elif command.find("serial")!=-1: DATA.connect_mode = "serial"
         else: 
             messagebox.showerror("SaveSystem", "ERROR 7(1): неизвестный режим работы")
             return
-
-        global_data_for_device_from_monitor = ""
-        global_potok_flag = True
+        # start thread
+        DATA.data_for_device_from_monitor = ""
+        DATA.potok_flag = True
         print("порт для запуска:",data)
-        try: global_last_port = int(data)
-        except: global_last_port = data
-        a = potok(global_last_port)
-        a.start()
-
+        DATA.port = data
+        potok(DATA)
     elif command=="monitor_message":
-        global_data_for_device_from_monitor += data
-        print("монитор:",global_data_for_device_from_monitor)
+        DATA.data_for_device_from_monitor += data
+        print("монитор (отправить):",DATA.data_for_device_from_monitor)
     else: # stop
-        global_data_for_device_from_monitor = ""
-        global_potok_flag = False
+        DATA.data_for_device_from_monitor = ""
+        DATA.potok_flag = False
+        DATA.device.close()
+        DATA.keyboard.destroy()
         window.del_expectation_viget()
-        global_device.close()
-        global_keyboard.destroy()
-        if global_connect_mode=="wi-fi": 
-            kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
 
-window = graphics("AVOCADO v1.3 beta",linux_mode=global_linux_mode)
+window = graphics("AVOCADO v2.0",linux_mode=DATA.linux_mode)
 window.extern_fun = test
 window.loop()
-global_potok_flag = False
-global_device.close()
-if global_connect_mode=="wi-fi": 
-    kill_all_server(ip=global_ip,port=global_last_port,linux_mode=global_linux_mode)
-#if global_linux_mode: exit()
+DATA.potok_flag = False
+DATA.device.close()
 print("КОНЕЦ")

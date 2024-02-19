@@ -6,11 +6,26 @@ AVOCADO - реализация wifi,bluetooth,Serail монитора для к�
 ### библиотека для ESP8266/ESP32
 https://github.com/Ni3nayka/AVOCADO_esp/releases
 
-### OC:
+### Установка Linux (debian подобные):
+```
+sudo sh install.sh
+```
 
-windows: 7,10
+### Консольная установка Linux (debian подобные):
+```
+sudo apt install wget unzip # optional
+wget -O AVOCADO.zip https://github.com/Ni3nayka/AVOCADO/archive/refs/heads/main.zip
+unzip AVOCADO.zip
+cd AVOCADO-main
+sudo sh install.sh
+```
 
-Linux: debian
+### Установка Windows 7,10
+Скачайте версию программы 1.2, последующие не тестировались в Виндовс:
 
-*под линукс больше опций, чем под виндовс
+https://github.com/Ni3nayka/AVOCADO/releases/tag/v_1_2
+
+*для Виндовс 11: лучше запускать программу в режиме совместимости с виндовс 10
+
+
 
