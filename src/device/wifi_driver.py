@@ -79,7 +79,12 @@ class wifi_device(Thread,device_pass):
         self.wifi_device.settimeout(1.0) # таймаут для опроса по wifi
         while self.enable:
             # получаем информацию с wifi
-            try: self.line += self.wifi_device.recv(1024).decode("utf-8")
+            try: 
+                data = self.wifi_device.recv(1024)
+                print(data)
+                try: self.line += data.decode("utf-8")
+                except UnicodeDecodeError: self.line += data.decode("utf-16")
+                except: self.line += "???????????????????????????????"
             except socket.timeout: pass
             except ConnectionAbortedError: 
                 print("хз что за проблема: Программа на вашем хост-компьютере разорвала установленное подключение")

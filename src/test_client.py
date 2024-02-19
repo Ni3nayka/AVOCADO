@@ -12,6 +12,11 @@ s.connect((host, port))
 for i in range(3):
     s.send(str(str(i)+"\n").encode('utf-8'))
     sleep(0.2)
+s.send("1234567890-=qwertyuiop[]sdfghjkl;'zxcvbnm,./\n".encode('utf-8'))
+sleep(0.2)
+s.send("йцукенгшщзхъфывапролджэячсмитьбю\n".encode('utf-8'))
+sleep(0.2)
+s.send("йцукенгшщзхъфывапролджэячсмитьбю\n".encode('utf-16'))
 print(s.recv(1024))
 print(s.recv(1024))
 s.close()                     # Close the socket when done     
