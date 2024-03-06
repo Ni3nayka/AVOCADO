@@ -146,7 +146,7 @@ def test(command,data=""):
         DATA.keyboard.destroy()
         window.del_expectation_viget()
 
-window = graphics("AVOCADO v2.0",linux_mode=DATA.linux_mode)
+window = graphics("AVOCADO v2.1 beta",linux_mode=DATA.linux_mode)
 window.extern_fun = test
 window.loop()
 DATA.potok_flag = False

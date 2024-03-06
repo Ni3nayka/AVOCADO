@@ -17,6 +17,8 @@ if [ $? -eq 0 ]; then
     pip3 install pillow
     sudo apt install python3-pil python3-pil.imagetk -y
     pip3 install pygame
+    sudo apt-get install libbluetooth-dev
+    pip install git+https://github.com/pybluez/pybluez.git #egg=pybluez
     } &> /dev/null
     echo "Необходимые зависимости установлены"
 else
